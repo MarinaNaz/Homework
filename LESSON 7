@@ -23,7 +23,6 @@ contract BirthdayPayout {
         string name;
         address account;
         uint256 birthday;
-        // added this attribute to store timestamp of last payout
         uint256 last_payout;
     }
 
@@ -36,36 +35,35 @@ contract BirthdayPayout {
 
     function addTeammate(address account,string memory name, uint256 birthday) public onlyOwner {
         require(msg.sender != account,"Cannot add oneself");
-        // notice that we have added "0" to set last_payout
+     
         Teammate memory newTeammate = Teammate(name,account, birthday,0); 
         _teammates.push(newTeammate);
         emit NewTeammate(account,name);
     }
 
     function findBirthday() public onlyOwner{
-        // it is a good idea to check whether therea are any teammates in the database
+       
         require(getTeammatesNumber()>0,"No teammates in the database");
-        // what are "for" loops: https://www.youtube.com/watch?v=GwcisLY5avc
-        // so basically we iterate over every Teammate in the _teammates array...
+        
         for(uint256 i=0;i<getTeammatesNumber();i++){
-        // and check their birthday
+        
             if(checkBirthday(i) && checkLastPayout(i)){
-            // if the birthday is today - send them a present!
+            
                 birthdayPayout(i);               
             }
         }
     }
 
     function birthdayPayout(uint256 index) public onlyOwner {
-    	// this is how we check if balance is enough for payout
+    	
         require(address(this).balance>=PRESENT,"Not enough balance");
-        // here we save information that the teammate has already received payment
+        
         setLastPayout(index);
-        // send some money to the teammate
+        
         sendToTeammate(index);
-        // and emit a HeppyBirthday event(just in case)
+        
         emit HappyBirthday(_teammates[index].name,_teammates[index].account);
-        // the problem is that this function does not save information that the teammate already received a compensation
+       
     }
 
     function setLastPayout(uint256 index) public{
