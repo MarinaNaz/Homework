@@ -99,18 +99,19 @@ contract Wolf is Carnivore{
     }
 }
 
-contract Dog is Herbivore, Carnivore {
-    function eat(string memory food) view  override(Herbivore.eat) onlyMeat(food) onlyPlant(food) public returns(string memory){
+contract Dog is Animal, HasName {
+    constructor(string memory name) HasName(name){
+
+    }
+    function eat(string memory food) view virtual override public returns(string memory){
+        require (!StringComparer.compare(food, "chocolate"), "chocolate is harmful for dog");
         return super.eat(food);
     }
-    
-    
-
-    function speak() view override public returns(string memory){
-        return "WOOF";
+    function speak() pure public returns(string memory){
+        return "Woof";
     }
-
 }
+    
      
      contract Farmer{
     function feed(address animal, string memory food) view public returns(string memory){
