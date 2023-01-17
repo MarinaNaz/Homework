@@ -1,7 +1,9 @@
 pragma solidity 0.8.17;
 
-interface Living{
-    function eat(string memory food) external returns(string memory);
+interface iAnimal{
+    function eat(string memory food) view external returns(string memory);
+    function speak() view external returns(string memory);
+    function sleep() view external returns(string memory);
 }
 
 contract HasName{
@@ -15,7 +17,10 @@ contract HasName{
     }
 }
 
-abstract contract Animal is Living{
+abstract contract Animal is iAnimal{
+    constructor(){
+
+    }
     
     function eat(string memory food) view virtual public returns(string memory){
         return string.concat(string.concat("Animal eats ",food));
@@ -37,6 +42,10 @@ library StringComparer{
 }
 
 abstract contract Herbivore is Animal, HasName{
+    constructor () Animal (){
+
+    }
+    
     string constant PLANT = "plant";
 
     modifier eatOnlyPlant(string memory food){
@@ -44,7 +53,7 @@ abstract contract Herbivore is Animal, HasName{
         _;
     }
 
-    function eat(string memory food) view virtualoverride public eatOnlyPlant(food) returns(string memory){
+    function eat(string memory food) view virtual override public eatOnlyPlant(food) returns(string memory){
         return super.eat(food);
     }
 }
@@ -72,13 +81,12 @@ contract Horse is Herbivore{
 abstract contract Carnivore is Animal{
     string constant MEAT = "meat";
 
+    function eat(string memory food) view virtual override public OnlyMeat(food) returns(string memory){
+        return super.eat(food);
+    }
     modifier OnlyMeat(string memory food){
         require(StringComparer.compare(food,MEAT),"It cannot eat that");
         _;
-    }
-
-    function eat(string memory food) view virtualoverride public OnlyMeat(food) returns(string memory){
-        return super.eat(food);
     }
 }
 
@@ -92,9 +100,12 @@ contract Wolf is Carnivore{
 }
 
 contract Dog is Herbivore, Carnivore {
-    function eat(string memory food) view overrride(Herbivore.eat) onlyMeat(food) onlyPlant(food) public
-    return super.eat(food);
+    function eat(string memory food) view  override(Herbivore.eat) onlyMeat(food) onlyPlant(food) public returns(string memory){
+        return super.eat(food);
+    }
     
+    
+
     function speak() view override public returns(string memory){
         return "WOOF";
     }
@@ -103,10 +114,10 @@ contract Dog is Herbivore, Carnivore {
      
      contract Farmer{
     function feed(address animal, string memory food) view public returns(string memory){
-        return Animal(animal).eat(food);
+        return iAnimal(animal).eat(food);
     }
 
     function call(address animal) view public returns(string memory){
-        return Animal(animal).speak();
+        return iAnimal(animal).speak();
     }
 }
